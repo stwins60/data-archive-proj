@@ -1,4 +1,4 @@
 .terraform/
 .terraform.**
 terraform.**
-archive.tfvars
+archive-st.tfvars
