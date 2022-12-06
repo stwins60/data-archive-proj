@@ -1,0 +1,76 @@
+name: "Deploy to AWS"
+on:
+  push:
+    branches:
+      - 'master'
+      - 'main'
+  pull_request:
+    branches:
+      - 'master'
+      - 'main'
+    
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name : Install Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.14.7
+
+      - name: Login to AWS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set default.region us-east-1
+
+      - name: Terraform Init
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.12.13
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: '.'
+          tf_actions_comment: true
+          tf_actions_cli_credentials_hostname: app.terraform.io 
+          tf_actions_cli_credentials_token: ${{ secrets.TF_API_TOKEN }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform Validate
+        run: terraform validate
+      - name: Wait for Terraform Plan Approval
+        # You may pin to the exact commit or the version.
+        # uses: jbergknoff/github-action-wait-for-terraform-plan-approval@ff23ef35b5f0ee7f41a5e9df6cc5df1700f0c6e6
+        uses: jbergknoff/github-action-wait-for-terraform-plan-approval@v1
+        with:
+          # What to do: either `submit` or `wait`.
+          command: wait
+          # The contents of the plan. ANSI color codes are fine. This should be plaintext, not base64-encoded. Required when `command == submit`.
+          #plan_contents: # optional
+          # The plan id to wait for. Required when `command == wait`.
+          #plan_id: # optional
+          # Base URL for the external service that will display plans for approval
+          external_service_url: https://terraform-plan-approval.herokuapp.com
+          # Give up waiting for approval/rejection after this many seconds
+          #timeout_seconds: # optional, default is 300
+          # The interval (in seconds) at which we'll check the plan status
+          #polling_period_seconds: # optional, default is 5
+      - name: Terraform Apply
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform apply -auto-approve -input=false
+      - name: Terraform destroy
+        # You may pin to the exact commit or the version.
+        # uses: daniyalj/terraform-destroy-actions@6262619d3c5971e362ba38eb8bea96a3f94c8ae1
+        uses: daniyalj/terraform-destroy-actions@v3
+        with:
+          # In the format of <org>
+          org_name: terraform-test-org-21
+          # In the format of <repo>
+          repo_name: stwins60/data-archive-proj
