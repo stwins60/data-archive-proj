@@ -1,0 +1,49 @@
+##########################################################################
+# .terrateam/config.yml
+##########################################################################
+apply_requirements:
+  checks:
+    approved:
+      enabled: false
+      count: 1
+    merge_conflicts:
+      enabled: true
+    status_checks:
+      enabled: true
+      ignore_matching: []
+  create_pending_apply_check: true
+automerge:
+  enabled: false
+  delete_branch: false
+checkout_strategy: merge
+default_tf_version: latest
+destination_branches:
+dirs:
+enabled: true
+hooks:
+  plan:
+    pre: []
+    post: []
+  apply:
+    pre: []
+    post: []
+parallel_runs: 3
+version: "1"
+on: [ "push", "pull_request"]
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+      - name: Terraform Init
+        run: terraform init
+      - name: Terraform Format
+        run: terraform fmt -check
+      - name: Terraform Validate
+        run: terraform validate
+      - name: Terraform Plan
+        run: terraform plan -out=plan.out
+      - name: Terraform Apply
+        run: terraform apply plan.out
+
