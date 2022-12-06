@@ -1,7 +1,10 @@
 variable "s3_bucket_names" {
   description = "S3 bucket name"
-  type        = list(any)
-  default     = ["lakeformation-data-archive-s3-bucket"]
+  type = map(object({
+    bucket_name = string
+    database_name = string
+    tags        = map(string)
+  }))
 }
 
 variable "force_destroy" {

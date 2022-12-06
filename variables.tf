@@ -4,10 +4,13 @@ variable "lakeformation" {
   default     = "lakeformation-data-archive"
 }
 
-variable "s3_buckets_names" {
+variable "s3_bucket_names" {
   description = "S3 bucket name"
-  type        = list(any)
-  default     = ["lakeformation-data-archive-s3-bucket"]
+  type = map(object({
+    bucket_name = string
+    database_name = string
+    tags        = map(string)
+  }))
 }
 
 variable "athena_database_names" {
@@ -33,6 +36,18 @@ variable "force_destroy" {
   type        = bool
   default     = true
 }
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "domain_name" {
+  description = "Domain name"
+  type        = string
+  default     = "example.com"
+}
+
 #variable "aws_secret_access_key" {
 #  description = "value of aws_secret_access_key"
 #}

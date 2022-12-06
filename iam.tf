@@ -37,7 +37,7 @@ EOF
 }
 
 resource "aws_iam_policy" "data_archive_crawler_role_policy" {
-  name  = "data_archive_crawler_role_policy"
+  name = "data_archive_crawler_role_policy"
 
   policy = <<EOF
 {
@@ -79,12 +79,12 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "data_archive_crawler_role" {
-  role      = aws_iam_role.data_archive_crawler_role.name
+  role       = aws_iam_role.data_archive_crawler_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
 resource "aws_iam_role_policy_attachment" "data_archive_crawler_role_2" {
-  role      = aws_iam_role.data_archive_crawler_role.name
+  role       = aws_iam_role.data_archive_crawler_role.name
   policy_arn = aws_iam_policy.data_archive_crawler_role_policy.arn
 }
 
