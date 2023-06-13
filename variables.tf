@@ -33,6 +33,15 @@ variable "force_destroy" {
   type        = bool
   default     = true
 }
+variable "aws_secret_access_key" {
+  description = "value of aws_secret_access_key"
+}
+
+variable "aws_access_key_id" {
+  description = "value of aws_access_key_id"
+}
+
+
 
 # variable "athena_table_location" {
 #   description = "Athena table location"
